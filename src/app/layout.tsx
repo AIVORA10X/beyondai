@@ -3,7 +3,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'BeyondAI | ابزارهای هوش مصنوعی',
-  description: 'پلتفرم فارسی معرفی و تهیه ابزارهای هوش مصنوعی',
+  description: 'مرجع فارسی معرفی و تهیه قانونی ابزارهای هوش مصنوعی — شفاف، امن، با پشتیبانی فارسی',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
