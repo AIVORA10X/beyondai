@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Header } from '@/components/Header';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -35,7 +34,13 @@ export default function LoginPage() {
 
   return (
     <main>
-      <Header />
+      <header className="topbar">
+        <Link className="brand" href="/">
+          <span className="brand-mark">B</span>
+          <span>BeyondAI</span>
+        </Link>
+        <Link href="/register" className="contact">ثبت‌نام</Link>
+      </header>
       <div className="auth-page">
         <h1>ورود به BeyondAI</h1>
         <form onSubmit={onSubmit}>
