@@ -10,8 +10,8 @@ export default async function AdminPage() {
   if (!user) redirect('/login');
   if (user.role !== 'admin') redirect('/dashboard');
 
-  const orders = getOrders();
-  const tickets = getTickets();
+  const orders = await getOrders();
+  const tickets = await getTickets();
 
   return (
     <main>

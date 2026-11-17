@@ -10,8 +10,8 @@ export default async function DashboardPage() {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
 
-  const orders = getOrdersByUser(user.id);
-  const tickets = getTicketsByUser(user.id);
+  const orders = await getOrdersByUser(user.id);
+  const tickets = await getTicketsByUser(user.id);
   const activeOrders = orders.filter((o) =>
     ['pending_review', 'awaiting_payment', 'in_progress', 'awaiting_user', 'paid'].includes(o.status)
   ).length;
