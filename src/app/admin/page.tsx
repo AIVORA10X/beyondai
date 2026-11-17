@@ -1,77 +1,42 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
-import { getOrders, orderStatusText } from '@/lib/orders';
+import { getOrders } from '@/lib/orders';
 import { getTickets } from '@/lib/tickets';
+import { getProducts } from '@/lib/catalog';
 import { Header } from '@/components/Header';
+import { AdminNav } from '@/components/AdminNav';
 
-export default async function AdminPage() {
+export default async function AdminHomePage() {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
   if (user.role !== 'admin') redirect('/dashboard');
 
-  const orders = await getOrders();
-  const tickets = await getTickets();
+  const [orders, tickets, products] = await Promise.all([getOrders(), getTickets(), getProducts()]);
+  const openTickets = tickets.filter((t) => t.status === 'open').length;
+  const pendingOrders = orders.filter((o) =>
+    ['pending_review', 'awaiting_payment', 'in_progress'].includes(o.status)
+  ).length;
 
   return (
     <main>
       <Header />
-      <section className="dash">
-        <div className="eyebrow"><span />پنل ادمین</div>
-        <h1>مدیریت BeyondAI</h1>
-        <p style={{ color: 'var(--muted)' }}>سفارش‌ها و تیکت‌های همه کاربران</p>
-
-        <h2 className="dash-title">همه سفارش‌ها ({orders.length})</h2>
-        {orders.length === 0 ? (
-          <p className="empty">سفارشی نیست</p>
-        ) : (
-          <div className="table-wrap">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>کد</th>
-                  <th>کاربر</th>
-                  <th>محصول</th>
-                  <th>مبلغ</th>
-                  <th>وضعیت</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((o) => (
-                  <tr key={o.id}>
-                    <td dir="ltr">{o.id}</td>
-                    <td>{o.userName}<br /><small dir="ltr">{o.userEmail}</small></td>
-                    <td>{o.productName}</td>
-                    <td>{o.amount ? o.amount.toLocaleString('fa-IR') : '—'}</td>
-                    <td>{orderStatusText[o.status]}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        <h2 className="dash-title">تیکت‌ها ({tickets.length})</h2>
-        {tickets.length === 0 ? (
-          <p className="empty">تیکتی نیست</p>
-        ) : (
-          <div className="ticket-list">
-            {tickets.map((t) => (
-              <div className="ticket-card" key={t.id}>
-                <div className="ticket-head">
-                  <strong>{t.subject}</strong>
-                  <span className="status-pill">{t.status}</span>
-                </div>
-                <p>{t.message}</p>
-                <small>{t.userName} · {t.userEmail} · {t.id}</small>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <p style={{ marginTop: 24 }}>
-          <Link href="/dashboard" className="secondary-btn">بازگشت به داشبورد</Link>
-        </p>
+      <section className="dash admin-layout">
+        <div className="eyebrow"><span />پنل ادمین BeyondAI</div>
+        <h1>مدیریت سایت</h1>
+        <p style={{ color: 'var(--muted)', marginBottom: 20 }}>سلام {user.name} — بخش‌های جدا برای مدیریت</p>
+        <AdminNav active="/admin" />
+        <div className="stats-grid" style={{ marginTop: 24 }}>
+          <Link href="/admin/orders" className="stat-card"><span className="stat-label">سفارش در جریان</span><strong>{pendingOrders}</strong></Link>
+          <Link href="/admin/orders" className="stat-card"><span className="stat-label">کل سفارش‌ها</span><strong>{orders.length}</strong></Link>
+          <Link href="/admin/tickets" className="stat-card"><span className="stat-label">تیکت باز</span><strong>{openTickets}</strong></Link>
+          <Link href="/admin/products" className="stat-card"><span className="stat-label">محصولات</span><strong>{products.length}</strong></Link>
+        </div>
+        <div className="admin-quick">
+          <Link href="/admin/products" className="primary">ویرایش قیمت‌ها</Link>
+          <Link href="/admin/orders" className="secondary-btn">سفارش‌ها</Link>
+          <Link href="/admin/tickets" className="secondary-btn">تیکت‌ها</Link>
+        </div>
       </section>
     </main>
   );
