@@ -1,0 +1,27 @@
+/* imported from layout if needed - inline admin styles also in globals via class names */
+.admin-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 8px; }
+.admin-nav-item {
+  padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600;
+  border: 1px solid rgba(120,160,255,0.12); color: #8b9bb8;
+}
+.admin-nav-item.active, .admin-nav-item:hover {
+  color: #e8f0ff; border-color: rgba(34,211,238,0.35); background: rgba(34,211,238,0.08);
+}
+.admin-quick { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+.admin-product-list, .admin-order-list { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+.admin-product-card, .admin-order-card {
+  background: #0f1525; border: 1px solid rgba(120,160,255,0.12); border-radius: 16px; padding: 18px;
+}
+.admin-product-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.admin-product-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 12px 0;
+}
+.admin-product-actions, .admin-form-row {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+}
+.admin-form-row select, .admin-form-row input, .admin-form-row textarea {
+  background: #0a0e1a; border: 1px solid rgba(120,160,255,0.12); border-radius: 10px;
+  padding: 10px 12px; color: #e8f0ff; font-family: inherit; font-size: 13px;
+}
+.admin-save-msg { color: #34d399; font-size: 13px; font-weight: 600; }
+.stat-card { text-decoration: none; color: inherit; }
