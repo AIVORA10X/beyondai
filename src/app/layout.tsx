@@ -3,10 +3,15 @@ import './globals.css';
 import './admin-styles.css';
 import './layout-extras.css';
 import './mobile.css';
+import './legal.css';
 
 export const metadata: Metadata = {
-  title: 'BeyondAI | ابزارهای هوش مصنوعی',
-  description: 'پلتفرم فارسی تهیه امن و شفاف ابزارهای هوش مصنوعی — سفارش، پیگیری، پشتیبانی',
+  title: {
+    default: 'BeyondAI | ابزارهای هوش مصنوعی',
+    template: '%s | BeyondAI',
+  },
+  description:
+    'پلتفرم فارسی تهیه امن و شفاف ابزارهای هوش مصنوعی — سفارش، پیگیری، پشتیبانی',
 };
 
 export const viewport: Viewport = {

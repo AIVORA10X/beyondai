@@ -13,19 +13,23 @@ export function SiteFooter() {
             </span>
             <span>BeyondAI</span>
           </Link>
-          <p className="footer-desc">پلتفرم فارسی تهیه امن ابزارهای هوش مصنوعی</p>
+          <p className="footer-desc">
+            پلتفرم فارسی تهیه امن ابزارهای هوش مصنوعی — شفاف، قابل پیگیری، با پشتیبانی.
+          </p>
         </div>
         <div>
-          <h4>دسترسی</h4>
+          <h4>خدمات</h4>
           <Link href="/#products">محصولات</Link>
           <Link href="/order">ثبت سفارش</Link>
           <Link href="/support">پشتیبانی</Link>
+          <Link href="/contact">تماس با ما</Link>
         </div>
         <div>
-          <h4>حساب</h4>
+          <h4>حساب و قوانین</h4>
           <Link href="/login">ورود</Link>
           <Link href="/register">ثبت‌نام</Link>
-          <Link href="/dashboard">داشبورد</Link>
+          <Link href="/terms">شرایط استفاده</Link>
+          <Link href="/privacy">حریم خصوصی</Link>
         </div>
       </div>
       <div className="footer-bottom">
