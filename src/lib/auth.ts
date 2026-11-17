@@ -15,10 +15,18 @@ export type User = {
 
 const SESSION_SECRET = process.env.SESSION_SECRET || 'beyondai-dev-secret-change-me-in-production-2026';
 const COOKIE_NAME = 'beyondai_session';
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'admin@beyondai.example')
+
+/** ایمیل‌های ادمین ثابت — از env یا پیش‌فرض مالک سایت */
+const ADMIN_EMAILS = (
+  process.env.ADMIN_EMAILS || 'tuhgf01@gmail.com'
+)
   .split(',')
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
+
+function isAdminEmail(email: string): boolean {
+  return ADMIN_EMAILS.includes(email.trim().toLowerCase());
+}
 
 export function hashPassword(password: string): string {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -39,14 +47,29 @@ export function verifyPassword(password: string, stored: string): boolean {
 }
 
 function mapUser(row: Record<string, unknown>): User {
+  const email = String(row.email);
+  let role = (row.role as UserRole) || 'user';
+  if (isAdminEmail(email)) role = 'admin';
   return {
     id: String(row.id),
     name: String(row.name),
-    email: String(row.email),
+    email,
     passwordHash: String(row.password_hash),
-    role: (row.role as UserRole) || 'user',
+    role,
     createdAt: new Date(String(row.created_at)).toISOString(),
   };
+}
+
+/** اگر ایمیل ادمین است و نقش در DB هنوز user است، به admin ارتقا بده */
+async function ensureAdminRole(user: User): Promise<User> {
+  if (!isAdminEmail(user.email) || user.role === 'admin') return user;
+  try {
+    const sql = getSql();
+    await sql`UPDATE users SET role = 'admin' WHERE id = ${user.id}`;
+  } catch {
+    /* ignore */
+  }
+  return { ...user, role: 'admin' };
 }
 
 export async function createUser(
@@ -63,7 +86,8 @@ export async function createUser(
   if (existing.length > 0) return { ok: false, error: 'این ایمیل قبلاً ثبت شده است.' };
   const countRows = await sql`SELECT COUNT(*)::int AS c FROM users`;
   const isFirstUser = Number(countRows[0]?.c || 0) === 0;
-  const role: UserRole = isFirstUser || ADMIN_EMAILS.includes(normalized) ? 'admin' : 'user';
+  const role: UserRole =
+    isFirstUser || isAdminEmail(normalized) ? 'admin' : 'user';
   const id = crypto.randomUUID();
   const passwordHash = hashPassword(password);
   const rows = await sql`
@@ -84,7 +108,7 @@ export async function findUserByEmail(email: string): Promise<User | undefined> 
     FROM users WHERE email = ${email.trim().toLowerCase()} LIMIT 1
   `;
   if (!rows[0]) return undefined;
-  return mapUser(rows[0] as Record<string, unknown>);
+  return ensureAdminRole(mapUser(rows[0] as Record<string, unknown>));
 }
 
 function sign(value: string): string {
@@ -136,7 +160,7 @@ export async function getCurrentUser(): Promise<Omit<User, 'passwordHash'> | nul
     FROM users WHERE id = ${userId} LIMIT 1
   `;
   if (!rows[0]) return null;
-  const user = mapUser(rows[0] as Record<string, unknown>);
+  const user = await ensureAdminRole(mapUser(rows[0] as Record<string, unknown>));
   const { passwordHash, ...safe } = user;
   return safe;
 }
