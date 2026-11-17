@@ -8,14 +8,15 @@ export async function POST(req: NextRequest) {
     if (!email || !password) {
       return NextResponse.json({ error: 'ایمیل و رمز عبور الزامی هستند.' }, { status: 400 });
     }
-    const user = findUserByEmail(email);
+    const user = await findUserByEmail(email);
     if (!user || !verifyPassword(password, user.passwordHash)) {
       return NextResponse.json({ error: 'ایمیل یا رمز عبور اشتباه است.' }, { status: 401 });
     }
     await setSessionCookie(user.id);
     const { passwordHash, ...safe } = user;
     return NextResponse.json({ user: safe });
-  } catch {
+  } catch (e) {
+    console.error(e);
     return NextResponse.json({ error: 'خطای سرور.' }, { status: 500 });
   }
 }

@@ -6,7 +6,8 @@ import { getProduct } from '@/lib/products';
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'وارد شوید' }, { status: 401 });
-  return NextResponse.json({ orders: getOrdersByUser(user.id) });
+  const orders = await getOrdersByUser(user.id);
+  return NextResponse.json({ orders });
 }
 
 export async function POST(req: NextRequest) {
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
     if (!product) {
       return NextResponse.json({ error: 'محصول یافت نشد' }, { status: 400 });
     }
-    const order = createOrder({
+    const order = await createOrder({
       userId: user.id,
       userName: user.name,
       userEmail: user.email,
@@ -30,7 +31,8 @@ export async function POST(req: NextRequest) {
       amount: product.amount,
     });
     return NextResponse.json({ order }, { status: 201 });
-  } catch {
+  } catch (e) {
+    console.error(e);
     return NextResponse.json({ error: 'خطای سرور' }, { status: 500 });
   }
 }

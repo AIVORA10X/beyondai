@@ -8,13 +8,14 @@ export async function POST(req: NextRequest) {
     if (!email || !password || !name) {
       return NextResponse.json({ error: 'نام، ایمیل و رمز عبور الزامی هستند.' }, { status: 400 });
     }
-    const result = createUser(name, email, password);
+    const result = await createUser(name, email, password);
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
     await setSessionCookie(result.user.id);
     return NextResponse.json({ user: result.user }, { status: 201 });
-  } catch {
+  } catch (e) {
+    console.error(e);
     return NextResponse.json({ error: 'خطای سرور.' }, { status: 500 });
   }
 }

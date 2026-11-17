@@ -5,7 +5,8 @@ import { createTicket, getTicketsByUser } from '@/lib/tickets';
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'وارد شوید' }, { status: 401 });
-  return NextResponse.json({ tickets: getTicketsByUser(user.id) });
+  const tickets = await getTicketsByUser(user.id);
+  return NextResponse.json({ tickets });
 }
 
 export async function POST(req: NextRequest) {
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
     if (!subject || !message) {
       return NextResponse.json({ error: 'موضوع و متن الزامی است' }, { status: 400 });
     }
-    const ticket = createTicket({
+    const ticket = await createTicket({
       userId: user.id,
       userName: user.name,
       userEmail: user.email,
@@ -25,7 +26,8 @@ export async function POST(req: NextRequest) {
       message,
     });
     return NextResponse.json({ ticket }, { status: 201 });
-  } catch {
+  } catch (e) {
+    console.error(e);
     return NextResponse.json({ error: 'خطای سرور' }, { status: 500 });
   }
 }

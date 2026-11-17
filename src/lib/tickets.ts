@@ -1,6 +1,5 @@
-import fs from 'fs';
-import path from 'path';
 import crypto from 'crypto';
+import { ensureSchema, getSql } from './db';
 
 export type TicketStatus = 'open' | 'answered' | 'closed';
 
@@ -17,53 +16,54 @@ export type Ticket = {
   updatedAt: string;
 };
 
-function dataDir() {
-  if (process.env.VERCEL) return path.join('/tmp', 'beyondai-data');
-  return path.join(process.cwd(), 'data');
-}
-const FILE = path.join(dataDir(), 'tickets.json');
-
-function ensure() {
-  const dir = path.dirname(FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(FILE)) fs.writeFileSync(FILE, '[]', 'utf-8');
-}
-
-export function getTickets(): Ticket[] {
-  ensure();
-  try {
-    return JSON.parse(fs.readFileSync(FILE, 'utf-8')) as Ticket[];
-  } catch {
-    return [];
-  }
+function mapTicket(row: Record<string, unknown>): Ticket {
+  return {
+    id: String(row.id),
+    userId: String(row.user_id),
+    userName: String(row.user_name),
+    userEmail: String(row.user_email),
+    subject: String(row.subject),
+    message: String(row.message),
+    status: row.status as TicketStatus,
+    reply: row.reply ? String(row.reply) : undefined,
+    createdAt: new Date(String(row.created_at)).toISOString(),
+    updatedAt: new Date(String(row.updated_at)).toISOString(),
+  };
 }
 
-function save(tickets: Ticket[]) {
-  ensure();
-  fs.writeFileSync(FILE, JSON.stringify(tickets, null, 2), 'utf-8');
-}
-
-export function createTicket(input: {
+export async function createTicket(input: {
   userId: string;
   userName: string;
   userEmail: string;
   subject: string;
   message: string;
-}): Ticket {
-  const tickets = getTickets();
-  const now = new Date().toISOString();
-  const t: Ticket = {
-    id: `TKT-${crypto.randomBytes(3).toString('hex').toUpperCase()}`,
-    ...input,
-    status: 'open',
-    createdAt: now,
-    updatedAt: now,
-  };
-  tickets.unshift(t);
-  save(tickets);
-  return t;
+}): Promise<Ticket> {
+  await ensureSchema();
+  const sql = getSql();
+  const id = `TKT-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+  const rows = await sql`
+    INSERT INTO tickets (id, user_id, user_name, user_email, subject, message, status)
+    VALUES (
+      ${id}, ${input.userId}, ${input.userName}, ${input.userEmail},
+      ${input.subject}, ${input.message}, 'open'
+    )
+    RETURNING *
+  `;
+  return mapTicket(rows[0] as Record<string, unknown>);
 }
 
-export function getTicketsByUser(userId: string): Ticket[] {
-  return getTickets().filter((t) => t.userId === userId);
+export async function getTickets(): Promise<Ticket[]> {
+  await ensureSchema();
+  const sql = getSql();
+  const rows = await sql`SELECT * FROM tickets ORDER BY created_at DESC`;
+  return rows.map((r) => mapTicket(r as Record<string, unknown>));
+}
+
+export async function getTicketsByUser(userId: string): Promise<Ticket[]> {
+  await ensureSchema();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT * FROM tickets WHERE user_id = ${userId} ORDER BY created_at DESC
+  `;
+  return rows.map((r) => mapTicket(r as Record<string, unknown>));
 }
