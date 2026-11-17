@@ -1,6 +1,5 @@
-import fs from 'fs';
-import path from 'path';
 import crypto from 'crypto';
+import { ensureSchema, getSql } from './db';
 
 export type OrderStatus =
   | 'pending_review'
@@ -31,33 +30,26 @@ export type Order = {
   teamNote?: string;
 };
 
-function dataDir() {
-  if (process.env.VERCEL) return path.join('/tmp', 'beyondai-data');
-  return path.join(process.cwd(), 'data');
-}
-const ORDERS_FILE = path.join(dataDir(), 'orders.json');
-
-function ensureFile() {
-  const dir = path.dirname(ORDERS_FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(ORDERS_FILE)) fs.writeFileSync(ORDERS_FILE, '[]', 'utf-8');
-}
-
-export function getOrders(): Order[] {
-  ensureFile();
-  try {
-    return JSON.parse(fs.readFileSync(ORDERS_FILE, 'utf-8')) as Order[];
-  } catch {
-    return [];
-  }
+function mapOrder(row: Record<string, unknown>): Order {
+  return {
+    id: String(row.id),
+    userId: String(row.user_id),
+    userName: String(row.user_name),
+    userEmail: String(row.user_email),
+    productId: String(row.product_id),
+    productName: String(row.product_name),
+    planNote: String(row.plan_note || ''),
+    userNote: String(row.user_note || ''),
+    status: row.status as OrderStatus,
+    paymentStatus: (row.payment_status as PaymentStatus) || 'none',
+    amount: Number(row.amount || 0),
+    createdAt: new Date(String(row.created_at)).toISOString(),
+    updatedAt: new Date(String(row.updated_at)).toISOString(),
+    teamNote: row.team_note ? String(row.team_note) : undefined,
+  };
 }
 
-function saveOrders(orders: Order[]) {
-  ensureFile();
-  fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf-8');
-}
-
-export function createOrder(input: {
+export async function createOrder(input: {
   userId: string;
   userName: string;
   userEmail: string;
@@ -66,41 +58,73 @@ export function createOrder(input: {
   planNote: string;
   userNote: string;
   amount?: number;
-}): Order {
-  const orders = getOrders();
-  const now = new Date().toISOString();
-  const order: Order = {
-    id: `ORD-${crypto.randomBytes(4).toString('hex').toUpperCase()}`,
-    ...input,
-    amount: input.amount ?? 0,
-    status: 'pending_review',
-    paymentStatus: 'none',
-    createdAt: now,
-    updatedAt: now,
-  };
-  orders.unshift(order);
-  saveOrders(orders);
-  return order;
+}): Promise<Order> {
+  await ensureSchema();
+  const sql = getSql();
+  const id = `ORD-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
+  const amount = input.amount ?? 0;
+  const rows = await sql`
+    INSERT INTO orders (
+      id, user_id, user_name, user_email, product_id, product_name,
+      plan_note, user_note, status, payment_status, amount
+    ) VALUES (
+      ${id}, ${input.userId}, ${input.userName}, ${input.userEmail},
+      ${input.productId}, ${input.productName}, ${input.planNote},
+      ${input.userNote}, 'pending_review', 'none', ${amount}
+    )
+    RETURNING *
+  `;
+  return mapOrder(rows[0] as Record<string, unknown>);
 }
 
-export function getOrdersByUser(userId: string): Order[] {
-  return getOrders().filter((o) => o.userId === userId);
+export async function getOrders(): Promise<Order[]> {
+  await ensureSchema();
+  const sql = getSql();
+  const rows = await sql`SELECT * FROM orders ORDER BY created_at DESC`;
+  return rows.map((r) => mapOrder(r as Record<string, unknown>));
 }
 
-export function getOrderById(id: string): Order | undefined {
-  return getOrders().find((o) => o.id === id);
+export async function getOrdersByUser(userId: string): Promise<Order[]> {
+  await ensureSchema();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT * FROM orders WHERE user_id = ${userId} ORDER BY created_at DESC
+  `;
+  return rows.map((r) => mapOrder(r as Record<string, unknown>));
 }
 
-export function updateOrder(
+export async function getOrderById(id: string): Promise<Order | undefined> {
+  await ensureSchema();
+  const sql = getSql();
+  const rows = await sql`SELECT * FROM orders WHERE id = ${id} LIMIT 1`;
+  if (!rows[0]) return undefined;
+  return mapOrder(rows[0] as Record<string, unknown>);
+}
+
+export async function updateOrder(
   id: string,
   patch: Partial<Pick<Order, 'status' | 'paymentStatus' | 'teamNote' | 'amount'>>
-): Order | null {
-  const orders = getOrders();
-  const idx = orders.findIndex((o) => o.id === id);
-  if (idx < 0) return null;
-  orders[idx] = { ...orders[idx], ...patch, updatedAt: new Date().toISOString() };
-  saveOrders(orders);
-  return orders[idx];
+): Promise<Order | null> {
+  await ensureSchema();
+  const sql = getSql();
+  const current = await getOrderById(id);
+  if (!current) return null;
+  const status = patch.status ?? current.status;
+  const paymentStatus = patch.paymentStatus ?? current.paymentStatus;
+  const teamNote = patch.teamNote ?? current.teamNote ?? null;
+  const amount = patch.amount ?? current.amount;
+  const rows = await sql`
+    UPDATE orders SET
+      status = ${status},
+      payment_status = ${paymentStatus},
+      team_note = ${teamNote},
+      amount = ${amount},
+      updated_at = NOW()
+    WHERE id = ${id}
+    RETURNING *
+  `;
+  if (!rows[0]) return null;
+  return mapOrder(rows[0] as Record<string, unknown>);
 }
 
 export const orderStatusText: Record<OrderStatus, string> = {
