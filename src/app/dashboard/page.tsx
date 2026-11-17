@@ -1,17 +1,22 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
-import { products, statusText } from '@/lib/products';
+import { getProducts, statusText } from '@/lib/catalog';
 import { getOrdersByUser, orderStatusText } from '@/lib/orders';
 import { getTicketsByUser } from '@/lib/tickets';
 import { Header } from '@/components/Header';
+import { ProductCard } from '@/components/ProductCard';
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
 
-  const orders = await getOrdersByUser(user.id);
-  const tickets = await getTicketsByUser(user.id);
+  const [orders, tickets, products] = await Promise.all([
+    getOrdersByUser(user.id),
+    getTicketsByUser(user.id),
+    getProducts().catch(() => []),
+  ]);
+
   const activeOrders = orders.filter((o) =>
     ['pending_review', 'awaiting_payment', 'in_progress', 'awaiting_user', 'paid'].includes(o.status)
   ).length;
@@ -40,7 +45,7 @@ export default async function DashboardPage() {
           <div className="stat-card"><span className="stat-label">سفارش‌های فعال</span><strong>{activeOrders}</strong></div>
           <div className="stat-card"><span className="stat-label">کل سفارش‌ها</span><strong>{orders.length}</strong></div>
           <div className="stat-card"><span className="stat-label">تیکت‌ها</span><strong>{tickets.length}</strong></div>
-          <div className="stat-card"><span className="stat-label">محصولات فعال</span><strong>{products.filter(p => p.status === 'active').length}</strong></div>
+          <div className="stat-card"><span className="stat-label">محصولات فعال</span><strong>{products.filter((p) => p.status === 'active').length}</strong></div>
         </div>
 
         <div className="dash-actions">
@@ -52,18 +57,7 @@ export default async function DashboardPage() {
         <h2 className="dash-title">قیمت محصولات</h2>
         <div className="grid">
           {products.map((p) => (
-            <article className="product-card" key={p.id}>
-              <div className="card-top">
-                <div className={`product-icon ${p.id}`}>{p.name.slice(0, 1)}</div>
-                <span className={`status ${p.status}`}>{statusText[p.status]}</span>
-              </div>
-              <h3>{p.name}</h3>
-              <p className="short-desc">{p.shortDesc}</p>
-              <div className="card-bottom">
-                <span className="price">{p.priceLabel}</span>
-                <Link href={`/order?product=${p.id}`} className="order-btn">سفارش</Link>
-              </div>
-            </article>
+            <ProductCard key={p.id} product={p} />
           ))}
         </div>
 
