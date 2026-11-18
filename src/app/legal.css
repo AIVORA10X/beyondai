@@ -54,10 +54,17 @@
 .trust-box h3 {
   font-size: 15px;
   margin-bottom: 10px;
+  color: var(--text);
 }
 .trust-box ul {
   margin: 0;
   padding-right: 18px;
+}
+.quick-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 @media (max-width: 720px) {
   .legal-page {

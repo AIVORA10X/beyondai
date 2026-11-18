@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { SiteFooter } from '@/components/SiteFooter';
+import { QuickContact } from '@/components/QuickContact';
+import { SITE } from '@/lib/site';
 
 export const metadata = {
-  title: 'تماس با ما | BeyondAI',
+  title: 'تماس با ما',
 };
 
 export default function ContactPage() {
@@ -14,27 +16,28 @@ export default function ContactPage() {
         <div className="eyebrow">ارتباط</div>
         <h1>تماس با BeyondAI</h1>
         <p className="legal-lead">
-          قبل از خرید یا وسط سفارش سوال دارید؟ از یکی از این راه‌ها با تیم در ارتباط باشید.
+          قبل از خرید یا وسط سفارش سوال دارید؟ از این راه‌ها با تیم در ارتباط باشید.
         </p>
+
+        <QuickContact />
 
         <div className="contact-cards">
           <article className="feature-card">
-            <h3>تیکت داخل سایت</h3>
-            <p>سریع‌ترین راه برای پیگیری سفارش و پشتیبانی رسمی.</p>
+            <h3>تیکت رسمی</h3>
+            <p>بهترین راه برای پیگیری سفارش ثبت‌شده.</p>
             <Link href="/support" className="primary" style={{ marginTop: 12 }}>
-              رفتن به پشتیبانی
+              پشتیبانی / تیکت
             </Link>
           </article>
           <article className="feature-card">
             <h3>ایمیل</h3>
-            <p>برای موضوعات عمومی و همکاری:</p>
             <p dir="ltr" style={{ color: 'var(--accent)', fontWeight: 600, marginTop: 8 }}>
-              tuhgf01@gmail.com
+              {SITE.supportEmail}
             </p>
           </article>
           <article className="feature-card">
-            <h3>داشبورد سفارش</h3>
-            <p>وضعیت سفارش‌های ثبت‌شده را از پنل کاربری ببینید.</p>
+            <h3>داشبورد</h3>
+            <p>وضعیت سفارش‌ها را ببینید.</p>
             <Link href="/dashboard" className="secondary-btn" style={{ marginTop: 12 }}>
               داشبورد من
             </Link>
@@ -42,11 +45,12 @@ export default function ContactPage() {
         </div>
 
         <div className="trust-box">
-          <h3>قبل از واریز بدانید</h3>
+          <h3>مسیر خرید شفاف</h3>
           <ul>
-            <li>مبلغ و امکان تحویل بعد از بررسی سفارش اعلام می‌شود.</li>
-            <li>رمز حساب سرویس‌های خارجی از شما گرفته نمی‌شود.</li>
-            <li>همه چیز از داشبورد و تیکت قابل پیگیری است.</li>
+            <li>۱) ثبت درخواست بدون پرداخت اجباری در لحظه</li>
+            <li>۲) بررسی تیم و اعلام مبلغ نهایی</li>
+            <li>۳) پرداخت بعد از تأیید</li>
+            <li>۴) تحویل و پیگیری در داشبورد</li>
           </ul>
         </div>
       </section>
