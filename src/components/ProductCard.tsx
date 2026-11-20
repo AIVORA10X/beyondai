@@ -1,15 +1,14 @@
 import Link from 'next/link';
 import type { Product } from '@/lib/catalog';
 import { statusText } from '@/lib/catalog';
+import { ProductIcon } from '@/components/ProductIcon';
 
 export function ProductCard({ product }: { product: Product }) {
   return (
     <article className="product-card">
       {product.tag ? <span className="product-tag">{product.tag}</span> : null}
+      <ProductIcon id={product.id} name={product.name} />
       <div className="card-top">
-        <div className={`product-icon ${product.id}`} aria-hidden>
-          {product.name.slice(0, 1)}
-        </div>
         <span className={`status ${product.status}`}>{statusText[product.status]}</span>
       </div>
       <div className="category">{product.category}</div>
