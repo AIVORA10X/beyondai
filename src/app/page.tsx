@@ -4,6 +4,7 @@ import { Header } from '@/components/Header';
 import { SiteFooter } from '@/components/SiteFooter';
 import { ProductCard } from '@/components/ProductCard';
 import { SectionHead } from '@/components/SectionHead';
+import { SideDecor } from '@/components/SideDecor';
 
 const FEATURES = [
   {
@@ -64,6 +65,7 @@ export default async function Home() {
 
   return (
     <main>
+      <SideDecor />
       <Header />
 
       <section className="hero" aria-labelledby="hero-title">
@@ -140,7 +142,7 @@ export default async function Home() {
         <SectionHead
           eyebrow="کاتالوگ"
           title="ابزارهایی که می‌توانید سفارش دهید"
-          subtitle="قیمت‌ها تقریبی‌اند و پس از بررسی سفارش ممکن است نهایی شوند."
+          subtitle="هر محصول آیکون مخصوص دارد؛ قیمت‌ها تقریبی‌اند و پس از بررسی نهایی می‌شوند."
         />
         <div className="grid">
           {products.length === 0 ? (

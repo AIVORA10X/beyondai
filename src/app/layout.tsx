@@ -4,6 +4,7 @@ import './admin-styles.css';
 import './layout-extras.css';
 import './mobile.css';
 import './legal.css';
+import '../components/SideDecor.css';
 
 export const metadata: Metadata = {
   title: {
