@@ -28,6 +28,7 @@ export type Order = {
   createdAt: string;
   updatedAt: string;
   teamNote?: string;
+  deliveryInfo?: string;
 };
 
 function mapOrder(row: Record<string, unknown>): Order {
@@ -46,6 +47,7 @@ function mapOrder(row: Record<string, unknown>): Order {
     createdAt: new Date(String(row.created_at)).toISOString(),
     updatedAt: new Date(String(row.updated_at)).toISOString(),
     teamNote: row.team_note ? String(row.team_note) : undefined,
+    deliveryInfo: row.delivery_info ? String(row.delivery_info) : undefined,
   };
 }
 
@@ -103,7 +105,9 @@ export async function getOrderById(id: string): Promise<Order | undefined> {
 
 export async function updateOrder(
   id: string,
-  patch: Partial<Pick<Order, 'status' | 'paymentStatus' | 'teamNote' | 'amount'>>
+  patch: Partial<
+    Pick<Order, 'status' | 'paymentStatus' | 'teamNote' | 'amount' | 'deliveryInfo'>
+  >
 ): Promise<Order | null> {
   await ensureSchema();
   const sql = getSql();
@@ -111,14 +115,17 @@ export async function updateOrder(
   if (!current) return null;
   const status = patch.status ?? current.status;
   const paymentStatus = patch.paymentStatus ?? current.paymentStatus;
-  const teamNote = patch.teamNote ?? current.teamNote ?? null;
+  const teamNote = patch.teamNote !== undefined ? patch.teamNote : current.teamNote ?? null;
   const amount = patch.amount ?? current.amount;
+  const deliveryInfo =
+    patch.deliveryInfo !== undefined ? patch.deliveryInfo : current.deliveryInfo ?? null;
   const rows = await sql`
     UPDATE orders SET
       status = ${status},
       payment_status = ${paymentStatus},
       team_note = ${teamNote},
       amount = ${amount},
+      delivery_info = ${deliveryInfo},
       updated_at = NOW()
     WHERE id = ${id}
     RETURNING *

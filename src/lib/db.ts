@@ -22,8 +22,10 @@ export async function ensureSchema() {
     plan_note TEXT DEFAULT '', user_note TEXT DEFAULT '',
     status TEXT NOT NULL DEFAULT 'pending_review',
     payment_status TEXT NOT NULL DEFAULT 'none', amount INTEGER NOT NULL DEFAULT 0,
-    team_note TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    team_note TEXT, delivery_info TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_info TEXT`;
   await sql`CREATE TABLE IF NOT EXISTS tickets (
     id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id),
     user_name TEXT NOT NULL, user_email TEXT NOT NULL,
@@ -38,5 +40,17 @@ export async function ensureSchema() {
     amount INTEGER NOT NULL DEFAULT 0, delivery_note TEXT NOT NULL DEFAULT '',
     features JSONB NOT NULL DEFAULT '[]', tag TEXT,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`;
+  await sql`CREATE TABLE IF NOT EXISTS payments (
+    id TEXT PRIMARY KEY,
+    order_id TEXT NOT NULL REFERENCES orders(id),
+    user_id TEXT NOT NULL,
+    amount INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    authority TEXT,
+    ref_id TEXT,
+    gateway TEXT NOT NULL DEFAULT 'mock',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    paid_at TIMESTAMPTZ
+  )`;
   migrated = true;
 }
