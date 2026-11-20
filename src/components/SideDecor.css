@@ -1,178 +1,65 @@
-/* Side decorations — desktop only */
 .side-decor { display: none; }
 
 @media (min-width: 1200px) {
   .side-decor {
     display: block;
     position: fixed;
-    top: 0;
-    bottom: 0;
-    width: 180px;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
+    top: 0; bottom: 0; width: 180px;
+    pointer-events: none; z-index: 0; overflow: hidden;
   }
   .side-decor-left { left: 0; }
   .side-decor-right { right: 0; }
-
-  .blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(40px);
-    opacity: 0.55;
-  }
-  .blob-a {
-    width: 160px; height: 160px; background: #99f6e4;
-    top: 18%; left: -40px;
-    animation: floaty 8s ease-in-out infinite;
-  }
-  .blob-b {
-    width: 120px; height: 120px; background: #c4b5fd;
-    bottom: 22%; left: 20px;
-    animation: floaty 10s ease-in-out infinite reverse;
-  }
-  .blob-c {
-    width: 150px; height: 150px; background: #fbcfe8;
-    top: 25%; right: -30px;
-    animation: floaty 9s ease-in-out infinite;
-  }
-  .blob-d {
-    width: 110px; height: 110px; background: #a5f3fc;
-    bottom: 18%; right: 10px;
-    animation: floaty 7s ease-in-out infinite reverse;
-  }
-
+  .blob { position: absolute; border-radius: 50%; filter: blur(40px); opacity: 0.55; }
+  .blob-a { width: 160px; height: 160px; background: #99f6e4; top: 18%; left: -40px; animation: floaty 8s ease-in-out infinite; }
+  .blob-b { width: 120px; height: 120px; background: #c4b5fd; bottom: 22%; left: 20px; animation: floaty 10s ease-in-out infinite reverse; }
+  .blob-c { width: 150px; height: 150px; background: #fbcfe8; top: 25%; right: -30px; animation: floaty 9s ease-in-out infinite; }
+  .blob-d { width: 110px; height: 110px; background: #a5f3fc; bottom: 18%; right: 10px; animation: floaty 7s ease-in-out infinite reverse; }
   .float-card {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.88);
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 12px 14px;
-    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
-    backdrop-filter: blur(10px);
-    min-width: 120px;
+    position: absolute; background: rgba(255,255,255,0.88); border: 1px solid #e2e8f0;
+    border-radius: 16px; padding: 12px 14px; box-shadow: 0 12px 32px rgba(15,23,42,0.08);
+    backdrop-filter: blur(10px); min-width: 120px;
   }
-  .float-card strong {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    color: #0f172a;
-  }
-  .float-card small {
-    font-size: 11px;
-    color: #64748b;
-  }
+  .float-card strong { display: block; font-size: 12px; font-weight: 700; color: #0f172a; }
+  .float-card small { font-size: 11px; color: #64748b; }
   .float-1 { top: 28%; left: 24px; animation: floaty 6s ease-in-out infinite; }
   .float-2 { top: 58%; left: 36px; animation: floaty 7.5s ease-in-out infinite reverse; }
   .float-3 { top: 32%; right: 24px; animation: floaty 6.5s ease-in-out infinite reverse; }
   .float-4 { top: 62%; right: 32px; animation: floaty 8s ease-in-out infinite; }
-
-  .float-dot {
-    width: 8px; height: 8px; border-radius: 50%; background: #0d9488;
-    display: inline-block; margin-bottom: 6px;
-    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.2);
-  }
-  .mini-bars {
-    display: flex; align-items: flex-end; gap: 3px; height: 16px; margin-bottom: 6px;
-  }
-  .mini-bars i {
-    display: block; width: 5px; border-radius: 2px; background: linear-gradient(180deg, #0d9488, #6366f1);
-  }
+  .float-dot { width: 8px; height: 8px; border-radius: 50%; background: #0d9488; display: inline-block; margin-bottom: 6px; box-shadow: 0 0 0 4px rgba(13,148,136,0.2); }
+  .mini-bars { display: flex; align-items: flex-end; gap: 3px; height: 16px; margin-bottom: 6px; }
+  .mini-bars i { display: block; width: 5px; border-radius: 2px; background: linear-gradient(180deg, #0d9488, #6366f1); }
   .mini-bars i:nth-child(1) { height: 6px; }
   .mini-bars i:nth-child(2) { height: 12px; }
   .mini-bars i:nth-child(3) { height: 9px; }
   .mini-bars i:nth-child(4) { height: 15px; }
-
-  .pulse-ring {
-    width: 10px; height: 10px; border-radius: 50%; background: #22c55e;
-    display: block; margin-bottom: 6px;
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
-    animation: pulse 2s infinite;
-  }
+  .pulse-ring { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; display: block; margin-bottom: 6px; animation: pulse 2s infinite; }
 }
 
-@keyframes floaty {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-}
+@keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45); }
-  70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.45); }
+  70% { box-shadow: 0 0 0 10px rgba(34,197,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
 }
 
-/* Product logos */
 .product-art {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 8px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 8px;
 }
 .logo-box {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  width: 72px; height: 72px; border-radius: 18px;
+  display: grid; place-items: center; overflow: hidden;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
 }
-.logo-svg {
-  width: 36px;
-  height: 36px;
-}
-.logo-chatgpt {
-  background: #10a37f;
-}
-.logo-gemini {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-}
-.logo-gemini .logo-svg {
-  width: 40px;
-  height: 40px;
-}
-.logo-grok {
-  background: #0a0a0a;
-}
-.logo-grok .logo-text-overlay {
-  position: absolute;
-  bottom: 6px;
-  font-size: 9px;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: 0.04em;
-}
-.logo-manus {
-  background: #f8f8f7;
-  border: 1px solid #e7e5e4;
-}
-.logo-manus .logo-svg {
-  width: 44px;
-  height: 44px;
-}
-.logo-higgsfield {
-  background: transparent;
-  box-shadow: 0 10px 24px rgba(192, 255, 0, 0.25);
-}
-.logo-higgsfield .logo-svg {
-  width: 64px;
-  height: 64px;
-}
+.logo-svg-full { width: 72px; height: 72px; display: block; }
+.logo-chatgpt { background: #10A37F; }
+.logo-gemini { background: #fff; }
+.logo-grok { background: #000; }
+.logo-manus { background: #fff; }
+.logo-higgsfield { background: #C8FF00; box-shadow: 0 10px 28px rgba(200, 255, 0, 0.35); }
 .logo-default {
   background: linear-gradient(135deg, #0d9488, #6366f1);
-  color: #fff;
-  font-weight: 800;
-  font-size: 22px;
+  color: #fff; font-weight: 800; font-size: 22px;
 }
 .product-art-name {
-  font-size: 11px;
-  font-weight: 700;
-  color: #64748b;
-  letter-spacing: 0.02em;
-}
-.product-card .card-top {
-  margin-top: 2px;
+  font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 0.02em;
 }
