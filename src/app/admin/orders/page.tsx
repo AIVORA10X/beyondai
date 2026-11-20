@@ -15,12 +15,19 @@ export default async function AdminOrdersPage() {
     <main>
       <Header />
       <section className="dash admin-layout">
-        <div className="eyebrow"><span />ادمین</div>
+        <div className="eyebrow">
+          <span />
+          ادمین
+        </div>
         <h1>سفارش‌ها</h1>
-        <p style={{ color: 'var(--muted)' }}>همه سفارش‌ها — وضعیت را تغییر دهید.</p>
+        <p style={{ color: 'var(--muted)', marginBottom: 8 }}>
+          مسیر: بررسی → منتظر پرداخت → پرداخت‌شده → در حال انجام → تکمیل با اطلاعات تحویل
+        </p>
         <AdminNav active="/admin/orders" />
         {orders.length === 0 ? (
-          <p className="empty" style={{ marginTop: 24 }}>هنوز سفارشی ثبت نشده.</p>
+          <p className="empty" style={{ marginTop: 24 }}>
+            هنوز سفارشی ثبت نشده.
+          </p>
         ) : (
           <div className="admin-order-list">
             {orders.map((o) => (
@@ -31,14 +38,27 @@ export default async function AdminOrdersPage() {
                 </div>
                 <p>
                   <strong>{o.productName}</strong> — {o.userName}{' '}
-                  <span dir="ltr" style={{ color: 'var(--muted)', fontSize: 13 }}>({o.userEmail})</span>
+                  <span dir="ltr" style={{ color: 'var(--muted)', fontSize: 13 }}>
+                    ({o.userEmail})
+                  </span>
                 </p>
                 <p style={{ color: 'var(--muted)', fontSize: 14 }}>
                   مبلغ: {o.amount ? o.amount.toLocaleString('fa-IR') + ' تومان' : '—'}
+                  {' · '}
+                  پرداخت: {o.paymentStatus}
                   {o.planNote ? ` · پلن: ${o.planNote}` : ''}
                 </p>
                 {o.userNote && <p style={{ fontSize: 14 }}>یادداشت کاربر: {o.userNote}</p>}
-                <OrderStatusForm orderId={o.id} currentStatus={o.status} teamNote={o.teamNote || ''} />
+                {o.deliveryInfo && (
+                  <p style={{ fontSize: 13, color: 'var(--ok)' }}>تحویل: {o.deliveryInfo}</p>
+                )}
+                <OrderStatusForm
+                  orderId={o.id}
+                  currentStatus={o.status}
+                  teamNote={o.teamNote || ''}
+                  amount={o.amount}
+                  deliveryInfo={o.deliveryInfo}
+                />
               </article>
             ))}
           </div>

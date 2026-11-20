@@ -1,15 +1,22 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
-import { getProducts, statusText } from '@/lib/catalog';
+import { getProducts } from '@/lib/catalog';
 import { getOrdersByUser, orderStatusText } from '@/lib/orders';
 import { getTicketsByUser } from '@/lib/tickets';
 import { Header } from '@/components/Header';
 import { ProductCard } from '@/components/ProductCard';
+import { PayButton } from '@/components/PayButton';
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ pay?: string; ref?: string; ordered?: string }>;
+}) {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
+
+  const sp = searchParams ? await searchParams : {};
 
   const [orders, tickets, products] = await Promise.all([
     getOrdersByUser(user.id),
@@ -27,9 +34,12 @@ export default async function DashboardPage() {
       <section className="dash">
         <div className="dash-hero">
           <div>
-            <div className="eyebrow"><span />داشبورد کاربری</div>
+            <div className="eyebrow">
+              <span />
+              داشبورد کاربری
+            </div>
             <h1>سلام، {user.name}</h1>
-            <p>سفارش‌ها، قیمت‌ها و پشتیبانی را از اینجا مدیریت کنید.</p>
+            <p>سفارش‌ها، پرداخت و پشتیبانی از اینجا پیگیری می‌شود.</p>
           </div>
           <div className="dash-user-card">
             <div className="avatar">{user.name.slice(0, 1)}</div>
@@ -41,17 +51,57 @@ export default async function DashboardPage() {
           </div>
         </div>
 
+        {sp.pay === 'ok' && (
+          <div className="trust-box" style={{ marginBottom: 20 }}>
+            <strong style={{ color: 'var(--ok)' }}>پرداخت موفق ثبت شد</strong>
+            {sp.ref ? <p style={{ fontSize: 13 }}>کد پیگیری: <span dir="ltr">{sp.ref}</span></p> : null}
+            <p style={{ fontSize: 13, color: 'var(--muted)' }}>تیم سفارش را بررسی و تحویل می‌کند.</p>
+          </div>
+        )}
+        {sp.pay === 'fail' && (
+          <div className="trust-box" style={{ marginBottom: 20 }}>
+            <strong style={{ color: 'var(--bad)' }}>پرداخت ناموفق بود</strong>
+            <p style={{ fontSize: 13 }}>دوباره از دکمه پرداخت امتحان کنید یا تیکت بزنید.</p>
+          </div>
+        )}
+        {sp.ordered === '1' && (
+          <div className="trust-box" style={{ marginBottom: 20 }}>
+            <strong>سفارش ثبت شد</strong>
+            <p style={{ fontSize: 13, color: 'var(--muted)' }}>بعد از بررسی ادمین، وضعیت به «منتظر پرداخت» تغییر می‌کند.</p>
+          </div>
+        )}
+
         <div className="stats-grid">
-          <div className="stat-card"><span className="stat-label">سفارش‌های فعال</span><strong>{activeOrders}</strong></div>
-          <div className="stat-card"><span className="stat-label">کل سفارش‌ها</span><strong>{orders.length}</strong></div>
-          <div className="stat-card"><span className="stat-label">تیکت‌ها</span><strong>{tickets.length}</strong></div>
-          <div className="stat-card"><span className="stat-label">محصولات فعال</span><strong>{products.filter((p) => p.status === 'active').length}</strong></div>
+          <div className="stat-card">
+            <span className="stat-label">سفارش‌های فعال</span>
+            <strong>{activeOrders}</strong>
+          </div>
+          <div className="stat-card">
+            <span className="stat-label">کل سفارش‌ها</span>
+            <strong>{orders.length}</strong>
+          </div>
+          <div className="stat-card">
+            <span className="stat-label">تیکت‌ها</span>
+            <strong>{tickets.length}</strong>
+          </div>
+          <div className="stat-card">
+            <span className="stat-label">محصولات فعال</span>
+            <strong>{products.filter((p) => p.status === 'active').length}</strong>
+          </div>
         </div>
 
         <div className="dash-actions">
-          <Link href="/order" className="primary">ثبت سفارش جدید</Link>
-          <Link href="/support" className="secondary-btn">پشتیبانی / تیکت</Link>
-          {user.role === 'admin' && <Link href="/admin" className="secondary-btn">پنل ادمین</Link>}
+          <Link href="/order" className="primary">
+            ثبت سفارش جدید
+          </Link>
+          <Link href="/support" className="secondary-btn">
+            پشتیبانی / تیکت
+          </Link>
+          {user.role === 'admin' && (
+            <Link href="/admin" className="secondary-btn">
+              پنل ادمین
+            </Link>
+          )}
         </div>
 
         <h2 className="dash-title">قیمت محصولات</h2>
@@ -63,7 +113,9 @@ export default async function DashboardPage() {
 
         <h2 className="dash-title">سفارش‌های من</h2>
         {orders.length === 0 ? (
-          <p className="empty">هنوز سفارشی ندارید. <Link href="/order">اولین سفارش را ثبت کنید</Link></p>
+          <p className="empty">
+            هنوز سفارشی ندارید. <Link href="/order">اولین سفارش را ثبت کنید</Link>
+          </p>
         ) : (
           <div className="table-wrap">
             <table className="data-table">
@@ -73,17 +125,39 @@ export default async function DashboardPage() {
                   <th>محصول</th>
                   <th>مبلغ</th>
                   <th>وضعیت</th>
-                  <th>تاریخ</th>
+                  <th>اقدام</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.map((o) => (
                   <tr key={o.id}>
                     <td dir="ltr">{o.id}</td>
-                    <td>{o.productName}</td>
+                    <td>
+                      {o.productName}
+                      {o.deliveryInfo ? (
+                        <div style={{ fontSize: 12, color: 'var(--ok)', marginTop: 4 }}>
+                          تحویل: {o.deliveryInfo}
+                        </div>
+                      ) : null}
+                      {o.teamNote && o.status === 'awaiting_payment' ? (
+                        <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>
+                          {o.teamNote}
+                        </div>
+                      ) : null}
+                    </td>
                     <td>{o.amount ? o.amount.toLocaleString('fa-IR') + ' تومان' : '—'}</td>
-                    <td><span className="status-pill">{orderStatusText[o.status]}</span></td>
-                    <td>{new Date(o.createdAt).toLocaleDateString('fa-IR')}</td>
+                    <td>
+                      <span className="status-pill">{orderStatusText[o.status]}</span>
+                    </td>
+                    <td>
+                      {o.status === 'awaiting_payment' && o.paymentStatus !== 'paid' ? (
+                        <PayButton orderId={o.id} />
+                      ) : o.paymentStatus === 'paid' ? (
+                        <span style={{ fontSize: 12, color: 'var(--ok)' }}>پرداخت شد</span>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -93,18 +167,24 @@ export default async function DashboardPage() {
 
         <h2 className="dash-title">تیکت‌های پشتیبانی</h2>
         {tickets.length === 0 ? (
-          <p className="empty">تیکتی ندارید. <Link href="/support">ایجاد تیکت</Link></p>
+          <p className="empty">
+            تیکتی ندارید. <Link href="/support">ایجاد تیکت</Link>
+          </p>
         ) : (
           <div className="ticket-list">
             {tickets.map((t) => (
               <div className="ticket-card" key={t.id}>
                 <div className="ticket-head">
                   <strong>{t.subject}</strong>
-                  <span className="status-pill">{t.status === 'open' ? 'باز' : t.status === 'answered' ? 'پاسخ‌داده‌شده' : 'بسته'}</span>
+                  <span className="status-pill">
+                    {t.status === 'open' ? 'باز' : t.status === 'answered' ? 'پاسخ‌داده‌شده' : 'بسته'}
+                  </span>
                 </div>
                 <p>{t.message}</p>
                 {t.reply && <p className="ticket-reply">پاسخ تیم: {t.reply}</p>}
-                <small dir="ltr">{t.id} · {new Date(t.createdAt).toLocaleString('fa-IR')}</small>
+                <small dir="ltr">
+                  {t.id} · {new Date(t.createdAt).toLocaleString('fa-IR')}
+                </small>
               </div>
             ))}
           </div>

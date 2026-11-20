@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
-import { getOrders, updateOrder, type OrderStatus } from '@/lib/orders';
+import { getOrders, updateOrder, type OrderStatus, type PaymentStatus } from '@/lib/orders';
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -13,13 +13,14 @@ export async function PATCH(req: NextRequest) {
   if (!user || user.role !== 'admin') return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   try {
     const body = await req.json();
-    const { id, status, teamNote, amount, paymentStatus } = body;
+    const { id, status, teamNote, amount, paymentStatus, deliveryInfo } = body;
     if (!id) return NextResponse.json({ error: 'id الزامی' }, { status: 400 });
     const order = await updateOrder(id, {
       status: status as OrderStatus | undefined,
       teamNote,
       amount,
-      paymentStatus,
+      paymentStatus: paymentStatus as PaymentStatus | undefined,
+      deliveryInfo,
     });
     if (!order) return NextResponse.json({ error: 'یافت نشد' }, { status: 404 });
     return NextResponse.json({ order });
