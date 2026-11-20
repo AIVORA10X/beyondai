@@ -6,35 +6,51 @@ import { ProductCard } from '@/components/ProductCard';
 import { SectionHead } from '@/components/SectionHead';
 
 const FEATURES = [
-  { icon: '◈', title: 'شفافیت کامل', text: 'شرایط رسمی و محدودیت‌ها قبل از فروش بررسی می‌شود.' },
-  { icon: '⬡', title: 'امنیت حساب', text: 'رمز و کد یک‌بارمصرف مشتریان هرگز دریافت نمی‌شود.' },
-  { icon: '◎', title: 'پیگیری سفارش', text: 'وضعیت هر درخواست را در داشبورد ببینید.' },
-  { icon: '✧', title: 'پشتیبانی فارسی', text: 'تیکت بزنید؛ تیم به زبان فارسی پاسخ می‌دهد.' },
+  {
+    icon: '✦',
+    title: 'مسیر شفاف خرید',
+    text: 'از انتخاب ابزار تا تحویل، هر مرحله در داشبورد قابل پیگیری است.',
+  },
+  {
+    icon: '◈',
+    title: 'بدون رمز حساب شما',
+    text: 'رمز یا کد یک‌بارمصرف سرویس‌های خارجی از شما گرفته و ذخیره نمی‌شود.',
+  },
+  {
+    icon: '◎',
+    title: 'پشتیبانی فارسی',
+    text: 'تیکت بزنید؛ تیم به زبان فارسی و با جزئیات پاسخ می‌دهد.',
+  },
+  {
+    icon: '⬡',
+    title: 'پرداخت بعد از تأیید',
+    text: 'اول درخواست بررسی می‌شود؛ مبلغ نهایی قبل از پرداخت اعلام می‌گردد.',
+  },
 ] as const;
 
 const STEPS = [
-  { n: '۱', title: 'ثبت‌نام', text: 'حساب بسازید و وارد شوید.' },
-  { n: '۲', title: 'انتخاب محصول', text: 'از کاتالوگ سفارش ثبت کنید.' },
-  { n: '۳', title: 'بررسی تیم', text: 'وضعیت در پنل به‌روز می‌شود.' },
-  { n: '۴', title: 'تکمیل', text: 'پس از تأیید، سفارش بسته می‌شود.' },
+  { n: '۱', title: 'ساخت حساب', text: 'ثبت‌نام کنید و وارد پنل خود شوید.' },
+  { n: '۲', title: 'ثبت سفارش', text: 'ابزار AI و پلن موردنظر را انتخاب کنید.' },
+  { n: '۳', title: 'بررسی و پرداخت', text: 'بعد از تأیید تیم، پرداخت را انجام دهید.' },
+  { n: '۴', title: 'تحویل', text: 'ادمین سفارش را تکمیل و وضعیت را به‌روز می‌کند.' },
 ] as const;
 
 const FAQS = [
   {
-    q: 'آیا رمز حساب از من گرفته می‌شود؟',
-    a: 'خیر. BeyondAI رمز یا کد یک‌بارمصرف حساب‌ها را درخواست و ذخیره نمی‌کند.',
+    q: 'آیا باید همین الان پرداخت کنم؟',
+    a: 'خیر. ابتدا سفارش ثبت و بررسی می‌شود. مبلغ نهایی و راهنمای پرداخت بعد از تأیید اعلام می‌شود.',
+  },
+  {
+    q: 'رمز حساب ChatGPT یا Gemini از من گرفته می‌شود؟',
+    a: 'خیر. BeyondAI رمز یا کد یک‌بارمصرف حساب‌های شما را درخواست و ذخیره نمی‌کند.',
   },
   {
     q: 'چطور وضعیت سفارش را ببینم؟',
-    a: 'بعد از ورود، در داشبورد لیست سفارش‌ها و وضعیت هر کدام را می‌بینید.',
+    a: 'پس از ورود، در داشبورد کاربری لیست سفارش‌ها و وضعیت هر کدام نمایش داده می‌شود.',
   },
   {
-    q: 'پشتیبانی چگونه است؟',
-    a: 'از بخش پشتیبانی تیکت بسازید؛ پاسخ در همان تیکت ثبت می‌شود.',
-  },
-  {
-    q: 'قیمت‌ها ثابت‌اند؟',
-    a: 'قیمت‌ها از پنل ادمین قابل به‌روزرسانی‌اند و روی سایت اعمال می‌شوند.',
+    q: 'اگر سوال داشتم چطور پشتیبانی بگیرم؟',
+    a: 'از بخش پشتیبانی تیکت بسازید یا از صفحه تماس با ما اقدام کنید.',
   },
 ] as const;
 
@@ -53,41 +69,41 @@ export default async function Home() {
       <section className="hero" aria-labelledby="hero-title">
         <div className="eyebrow">
           <span aria-hidden />
-          پلتفرم فارسی ابزارهای هوش مصنوعی
+          پلتفرم فارسی دسترسی به ابزارهای AI
         </div>
         <h1 id="hero-title">
-          دسترسی قانونی و امن به
+          هوش مصنوعی را
           <br />
-          <em>قدرت هوش مصنوعی</em>
+          <em>ساده، امن و شفاف</em> تهیه کنید
         </h1>
         <p>
-          BeyondAI مسیر شفاف تهیه ابزارهای AI است؛ از انتخاب تا تحویل، با پشتیبانی فارسی و بدون
-          درخواست رمز حساب.
+          BeyondAI برای کسانی است که می‌خواهند ابزارهای AI را با مسیر مشخص سفارش دهند؛
+          بدون ابهام در قیمت، بدون درخواست رمز حساب، و با پشتیبانی واقعی فارسی.
         </p>
         <div className="hero-cta">
           <a className="primary" href="#products">
-            مشاهده کاتالوگ
+            مشاهده ابزارها
           </a>
           <Link href="/register" className="secondary-btn">
             شروع رایگان
           </Link>
         </div>
         <div className="hero-note">
-          <span>✓ شفافیت شرایط</span>
-          <span>✓ پشتیبانی فارسی</span>
-          <span>✓ پیگیری سفارش</span>
+          <span>ثبت سفارش بدون پرداخت اجباری</span>
+          <span>پیگیری در داشبورد</span>
+          <span>پشتیبانی تیکتی</span>
         </div>
       </section>
 
-      <section className="stats-bar" aria-label="آمار کلیدی">
+      <section className="stats-bar" aria-label="نکات کلیدی">
         <div className="stats-bar-inner">
           <div>
-            <strong>+۵</strong>
-            <span>ابزار منتخب</span>
+            <strong>AI</strong>
+            <span>ابزارهای منتخب</span>
           </div>
           <div>
-            <strong>۲۴/۷</strong>
-            <span>ثبت درخواست</span>
+            <strong>۳ گام</strong>
+            <span>تا تحویل سفارش</span>
           </div>
           <div>
             <strong>۰</strong>
@@ -103,9 +119,9 @@ export default async function Home() {
       <section className="features" id="features">
         <SectionHead
           center
-          eyebrow="چرا BeyondAI"
-          title="ساخته‌شده برای اعتماد"
-          subtitle="هر مرحله قابل پیگیری است و هیچ محصولی بدون بررسی فعال نمی‌شود."
+          eyebrow="تجربه خرید"
+          title="طراحی‌شده برای اعتماد مشتری"
+          subtitle="قبل از پرداخت همه چیز روشن است؛ بعد از پرداخت هم وضعیت را می‌بینید."
         />
         <div className="features-grid">
           {FEATURES.map((f) => (
@@ -123,12 +139,12 @@ export default async function Home() {
       <section className="products" id="products">
         <SectionHead
           eyebrow="کاتالوگ"
-          title="ابزارهای منتخب هوش مصنوعی"
-          subtitle="قیمت و وضعیت از پنل ادمین قابل به‌روزرسانی است."
+          title="ابزارهایی که می‌توانید سفارش دهید"
+          subtitle="قیمت‌ها تقریبی‌اند و پس از بررسی سفارش ممکن است نهایی شوند."
         />
         <div className="grid">
           {products.length === 0 ? (
-            <p className="empty">کاتالوگ به‌زودی بارگذاری می‌شود.</p>
+            <p className="empty">کاتالوگ در حال آماده‌سازی است.</p>
           ) : (
             products.map((p) => <ProductCard key={p.id} product={p} />)
           )}
@@ -136,7 +152,7 @@ export default async function Home() {
       </section>
 
       <section className="how" id="how">
-        <SectionHead center eyebrow="فرآیند" title="چهار قدم تا تحویل" />
+        <SectionHead center eyebrow="فرآیند" title="از ورود تا تحویل" />
         <div className="steps">
           {STEPS.map((s) => (
             <div className="step" key={s.n}>
@@ -151,7 +167,7 @@ export default async function Home() {
       </section>
 
       <section className="faq" id="faq">
-        <SectionHead center eyebrow="سوالات پرتکرار" title="قبل از سفارش بدانید" />
+        <SectionHead center eyebrow="سوالات" title="قبل از سفارش بدانید" />
         <div className="faq-grid">
           {FAQS.map((item, i) => (
             <details className="faq-item" key={item.q} open={i === 0}>
@@ -162,16 +178,16 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="cta-band" id="about">
-        <div className="eyebrow">BeyondAI</div>
-        <h2>از ایده تا دسترسی، یک مسیر شفاف</h2>
-        <p>برای تیم‌ها و افرادی که ابزار AI را منظم و با پشتیبانی فارسی می‌خواهند.</p>
+      <section className="cta-band">
+        <div className="eyebrow">آماده شروع؟</div>
+        <h2>حساب بسازید و اولین سفارش را ثبت کنید</h2>
+        <p>ثبت‌نام رایگان است. پرداخت فقط بعد از تأیید سفارش انجام می‌شود.</p>
         <div className="hero-cta">
           <Link href="/register" className="primary">
             ساخت حساب
           </Link>
           <Link href="/login" className="secondary-btn">
-            ورود به پنل
+            ورود
           </Link>
         </div>
       </section>
